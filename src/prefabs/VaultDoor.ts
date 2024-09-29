@@ -1,0 +1,55 @@
+import { Container, Sprite, Texture } from "pixi.js";
+import { BgConfig } from "./ParallaxBackground";
+import { Debug } from "../utils/debug";
+
+export default class VaultDoor extends Container{
+
+    private doorName = "door";
+    private doorOpenName = "doorOpen";
+    doorTexture : Texture = Texture.EMPTY; //likely temporary solution
+    doorSprite : Sprite = Sprite.from(Texture.EMPTY); //likely temporary solution
+
+    constructor(
+        protected config: BgConfig = {
+            panSpeed: 1,
+            layers: []
+        }
+    ){
+        super();
+        this.init();
+        this.openDoor();
+    }
+
+    init(){
+        //a close door method seems unnecessary, as the game ends once the door is open
+        this.doorTexture = Texture.from(this.doorName)
+        this.doorSprite = Sprite.from(this.doorTexture);
+
+        //approximate values, needs fixing; TO DO
+        this.doorSprite.width = this.doorTexture.width/4.5;
+        this.doorSprite.height = this.doorTexture.height/4.5;
+        
+        //approximate values, needs fixing; TO DO
+        this.doorSprite.position.x = 450;        
+        this.doorSprite.position.y = 120;
+
+        this.addChild(this.doorSprite);
+    }
+
+    resize(width: number, height: number){
+        //TO DO
+    }
+
+    openDoor(){
+        this.doorTexture = Texture.from(this.doorOpenName)
+        this.doorSprite.texture = this.doorTexture;
+
+        //approximate values, needs fixing; TO DO
+        this.doorSprite.width = this.doorTexture.width/4.5;
+        this.doorSprite.height = this.doorTexture.height/4.5;
+        
+        //approximate values, needs fixing; TO DO
+        this.doorSprite.position.x = 580;        
+        this.doorSprite.position.y = 120;        
+    }
+}

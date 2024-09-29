@@ -19,5 +19,12 @@ export default {
       ],
       panSpeed: 0.2,
     },
+    vault: {
+      layers: [
+        "door",
+        "vault_wall",
+      ],
+      panSpeed: 0.2,
+    },
   },
 } as Config;

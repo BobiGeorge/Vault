@@ -11,7 +11,7 @@ export default class Game extends Scene {
   private background!: ParallaxBackground;
 
   load() {
-    this.background = new ParallaxBackground(config.backgrounds.forest);
+    this.background = new ParallaxBackground(config.backgrounds.vault);
     this.player = new Player();
 
     this.player.x = window.innerWidth / 2;
