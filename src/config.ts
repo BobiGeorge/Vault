@@ -21,7 +21,6 @@ export default {
     },
     vault: {
       layers: [
-        "door",
         "vault_wall",
       ],
       panSpeed: 0.2,

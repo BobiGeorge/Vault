@@ -1,23 +1,18 @@
 import { Container, Sprite, Texture } from "pixi.js";
-import { BgConfig } from "./ParallaxBackground";
 import { Debug } from "../utils/debug";
 
 export default class VaultDoor extends Container{
 
-    private doorName = "door";
-    private doorOpenName = "doorOpen";
-    doorTexture : Texture = Texture.EMPTY; //likely temporary solution
+    private doorName = "door";   //name of the texture
+    private doorOpenName = "doorOpen";   //name of the texture
+
+    doorTexture? : Texture; //likely temporary solution
     doorSprite : Sprite = Sprite.from(Texture.EMPTY); //likely temporary solution
 
-    constructor(
-        protected config: BgConfig = {
-            panSpeed: 1,
-            layers: []
-        }
-    ){
+    constructor(){
         super();
         this.init();
-        this.openDoor();
+        //this.openDoor();
     }
 
     init(){
