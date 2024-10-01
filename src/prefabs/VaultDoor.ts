@@ -1,5 +1,4 @@
 import { Container, Sprite, Texture } from "pixi.js";
-import { Debug } from "../utils/debug";
 
 export default class VaultDoor extends Container{
 
@@ -12,7 +11,6 @@ export default class VaultDoor extends Container{
     constructor(){
         super();
         this.init();
-        //this.openDoor();
     }
 
     init(){
@@ -31,9 +29,9 @@ export default class VaultDoor extends Container{
         this.addChild(this.doorSprite);
     }
 
-    resize(width: number, height: number){
-        //TO DO
-    }
+    // resize(width: number, height: number){
+    //     //TO DO
+    // }
 
     openDoor(){
         this.doorTexture = Texture.from(this.doorOpenName)
