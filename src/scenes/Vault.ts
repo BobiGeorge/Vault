@@ -9,7 +9,7 @@ export default class Vault extends Scene{
 
     public combination: boolean[] = [];    //true for left, false for right
 
-    private combinationRange: number = 3; //combination number will be between 1 and combinationRange
+    private combinationRange: number = 9; //combination number will be between 1 and combinationRange
 
     private background!: ParallaxBackground;
     private vaultDoor!: VaultDoor;
@@ -28,8 +28,6 @@ export default class Vault extends Scene{
 
     onResize(width: number, height: number): void {
         this.background.resize(width, height);
-        console.log(this.combination);
-
     }
 
     //I assume you do not need to return to a starting position before entering the next step
@@ -56,9 +54,6 @@ export default class Vault extends Scene{
     }
 
     private turnHandle = (direction: boolean) =>{
-        console.log("It is turning " + direction);
-        console.log(this.combination[0]);
-
         if (direction != this.combination[0]) this.generateCombination();
         this.combination.shift();
         console.log(this.combination);
@@ -70,6 +65,5 @@ export default class Vault extends Scene{
         this.vaultDoor.openDoor();
         this.handle.disable();
     }
-
   
 }

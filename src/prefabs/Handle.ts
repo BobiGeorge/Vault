@@ -39,44 +39,37 @@ export default class Handle extends Container{
 
         this.addChild(this.handleSprite);
     }
+  
+    setHandleTurners(){
+        this.handleLeft.setInterractive(true);
+        this.handleRight.setInterractive(true);
+
+        this.handleLeft.on("mousedown", () => {this.turnHandle(true);});
+        this.handleRight.on("mousedown", () => {this.turnHandle(false);});
+
+        this.addChild(this.handleLeft, this.handleRight);
+    }
 
     //true for left, false for right
+    public async turnHandle(direction: boolean){
+        this.onTurnCallback(direction);
+        this.setInterractive(false);
+        await this.setDelay(this.spinDuration*1000);  
+        this.setInterractive(true);
+
+        this.turnAnimation(direction);
+    }
+
+    //true for left, false for right
+    //this method is responsible solely for animation
     public turnAnimation(direction: boolean){        
         const rotation = direction ? Math.abs(this.spinRotation) : -Math.abs(this.spinRotation);
         gsap.to(this.handleSprite, {duration: this.spinDuration, rotation: rotation})   
     }
 
-    //true for left, false for right
-    public turnHandle(direction: boolean){
-
-        this.turnAnimation(direction);
-    }
-
-    setHandleTurners(){
-        this.handleLeft.setInterractive(true);
-        this.handleRight.setInterractive(true);
-
-        this.handleLeft.on("mousedown", async () => {
-           // this.spin(true);
-            this.onTurnCallback(true);
-            this.setInterractive(false);
-            console.log("Left click");
-            await this.setDelay(this.spinDuration*1000);  
-            this.setInterractive(true);
-            console.log("Can interract");
-        });
-
-        this.handleRight.on("mousedown", async () => {
-           // this.spin(false);
-            this.onTurnCallback(false);
-            this.setInterractive(false);
-            console.log("Right click");
-            await this.setDelay(this.spinDuration*1000);
-            this.setInterractive(true);
-            console.log("Can interract");
-        });
-
-        this.addChild(this.handleLeft, this.handleRight);
+    //when the combination resets, a crazy animation plays
+    public crazySpinAnimatio(){
+        //TO DO
     }
 
     //sets interractivity for both handles; both are always either enabled or disabled at once
@@ -85,15 +78,15 @@ export default class Handle extends Container{
         this.handleRight.setInterractive(interactive);
     }
 
+    public disable(){
+        this.interactive = false;
+        this.visible = false;
+    }
+
     //this method should be moved elswhere
     setDelay(delay: number) {
         return new Promise(function(resolve) {
             setTimeout(resolve, delay);
         });
-    }
-
-    public disable(){
-        this.interactive = false;
-        this.visible = false;
     }
 }

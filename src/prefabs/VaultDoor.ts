@@ -4,23 +4,24 @@ export default class VaultDoor extends Container{
 
     private doorName = "door";   //name of the texture
     private doorOpenName = "doorOpen";   //name of the texture
+    private goldShineName = "blink";   //name of the texture
 
-    doorTexture? : Texture; //likely temporary solution
-    doorSprite : Sprite = Sprite.from(Texture.EMPTY); //likely temporary solution
+    doorSprite : Sprite;
 
     constructor(){
         super();
-        this.init();
+
+        //a close door method seems unnecessary, as the game ends once the door is open
+        const doorTexture = Texture.from(this.doorName)
+        this.doorSprite = Sprite.from(doorTexture);
+
+        this.setClosedDoor();
     }
 
-    init(){
-        //a close door method seems unnecessary, as the game ends once the door is open
-        this.doorTexture = Texture.from(this.doorName)
-        this.doorSprite = Sprite.from(this.doorTexture);
-
+    setClosedDoor(){
         //approximate values, needs fixing; TO DO
-        this.doorSprite.width = this.doorTexture.width/4.5;
-        this.doorSprite.height = this.doorTexture.height/4.5;
+        this.doorSprite.width /= 4.5;
+        this.doorSprite.height /= 4.5;
         
         //approximate values, needs fixing; TO DO
         this.doorSprite.position.x = 450;        
@@ -29,20 +30,33 @@ export default class VaultDoor extends Container{
         this.addChild(this.doorSprite);
     }
 
-    // resize(width: number, height: number){
-    //     //TO DO
-    // }
-
     openDoor(){
-        this.doorTexture = Texture.from(this.doorOpenName)
-        this.doorSprite.texture = this.doorTexture;
+        const doorTexture = Texture.from(this.doorOpenName)
+        this.doorSprite.texture = doorTexture;
 
         //approximate values, needs fixing; TO DO
-        this.doorSprite.width = this.doorTexture.width/4.5;
-        this.doorSprite.height = this.doorTexture.height/4.5;
+        this.doorSprite.width = doorTexture.width/4.5;
+        this.doorSprite.height = doorTexture.height/4.5;
         
         //approximate values, needs fixing; TO DO
         this.doorSprite.position.x = 580;        
-        this.doorSprite.position.y = 120;        
+        this.doorSprite.position.y = 120;     
+        
+        this.goldShine();
     }
+
+    goldShine(){
+        const goldShineTexture = Texture.from(this.goldShineName);
+        const goldShineSprite = Sprite.from(goldShineTexture);
+
+        goldShineSprite.position.x = 250; 
+        goldShineSprite.position.y = 150;        
+
+        this.addChild(goldShineSprite);
+    }
+
+    resize(width: number, height: number){
+        //TO DO
+    }
+
 }
