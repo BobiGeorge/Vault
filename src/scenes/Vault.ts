@@ -34,19 +34,15 @@ export default class Vault extends Scene{
     //I assume the safe doesn't necessarily alternate between clockwise and counterclockwise
     //->meaning clockwise/clockwise/clockwise is a possible combination
     generateCombination() {
+        console.log("Combination has been reset");
         this.combination.length = 0;
-        console.log("---------");
         for (let i = 0; i < 3; i++) {
             const combinationNbr = Math.floor(Math.random() * this.combinationRange) + 1;
             const direction = Math.random() < 0.5;
-            console.log(combinationNbr);        
-            console.log(direction);
             for (let y = 0; y < combinationNbr; y++) {
                 this.combination.push(direction);
             }
-        }
-        console.log("---------");
-        
+        }        
         for (let i = 0; i < this.combination.length; i++) {
             console.log(this.combination[i]);
         }
@@ -55,7 +51,7 @@ export default class Vault extends Scene{
 
     private turnHandle = (direction: boolean) =>{
         if (direction != this.combination[0]) this.generateCombination();
-        this.combination.shift();
+        else this.combination.shift();
         console.log(this.combination);
         if(this.combination.length == 0) this.win();
     }
