@@ -1,18 +1,28 @@
 import { Container, Sprite, Texture } from "pixi.js";
+import * as PIXI from "pixi.js";
 import gsap from "gsap";
 import HandleTurner from "./HandleTurner";
+import { PixiPlugin } from "gsap/PixiPlugin";
+import { wait } from "../utils/misc";
+import { Direction } from "../utils/Direction";
+
+// register the plugin
+gsap.registerPlugin(PixiPlugin);
+
+// give the plugin a reference to the PIXI object
+PixiPlugin.registerPIXI(PIXI);
 
 export default class Handle extends Container{
 
-    private handleName = "handle";   //name of the texture
+    private handleName = "handle_test";   //name of the texture
     private spinDuration = 0.5;   
-    private spinRotation = 2.15;  //the degree of rotation; can use negative values to change direction
+    private spinRotation = 2;  //the degree of rotation; can use negative values to change direction
 
     private handleSprite : Sprite;
     private handleLeft : HandleTurner;
     private handleRight : HandleTurner;
 
-    constructor(private onTurnCallback : (direction: boolean) => void){ 
+    constructor(private onTurnCallback : (direction: Direction) => void){ 
         super();
 
         const handleTexture = Texture.from(this.handleName)
@@ -34,8 +44,7 @@ export default class Handle extends Container{
         this.handleSprite.position.x = 655;        
         this.handleSprite.position.y = 320;
 
-        this.handleSprite.anchor.x = 0.5;
-        this.handleSprite.anchor.y = 0.5;
+        this.handleSprite.anchor.set(0.5);
 
         this.addChild(this.handleSprite);
     }
@@ -44,27 +53,28 @@ export default class Handle extends Container{
         this.handleLeft.setInterractive(true);
         this.handleRight.setInterractive(true);
 
-        this.handleLeft.on("mousedown", () => {this.turnHandle(true);});
-        this.handleRight.on("mousedown", () => {this.turnHandle(false);});
+        this.handleLeft.on("mousedown", () => {this.turnHandle(Direction.CLOCKWISE);});
+        this.handleRight.on("mousedown", () => {this.turnHandle(Direction.COUNTERCLOCKWISE);});
 
         this.addChild(this.handleLeft, this.handleRight);
     }
 
     //true for left, false for right
-    public async turnHandle(direction: boolean){
+    public async turnHandle(direction: Direction){
+        this.turnAnimation(direction); //animation needs to play first regardless of result
+
         this.onTurnCallback(direction);
         this.setInterractive(false);
-        await this.setDelay(this.spinDuration*1000);  
+        await wait(this.spinDuration);  
         this.setInterractive(true);
-
-        this.turnAnimation(direction);
     }
 
     //true for left, false for right
     //this method is responsible solely for animation
-    public turnAnimation(direction: boolean){        
-        const rotation = direction ? Math.abs(this.spinRotation) : -Math.abs(this.spinRotation);
-        gsap.to(this.handleSprite, {duration: this.spinDuration, rotation: rotation})   
+    public turnAnimation(direction: Direction){        
+        const rotation = direction ? -Math.abs(this.spinRotation) : Math.abs(this.spinRotation);
+        gsap.to(this.handleSprite, {duration: this.spinDuration, rotation: rotation, repeatRefresh: true})     
+        //gsap.to(this.handleSprite, {pixi: {rotation: rotation}, duration: 1});
     }
 
     //when the combination resets, a crazy animation plays
@@ -83,10 +93,7 @@ export default class Handle extends Container{
         this.visible = false;
     }
 
-    //this method should be moved elswhere
-    setDelay(delay: number) {
-        return new Promise(function(resolve) {
-            setTimeout(resolve, delay);
-        });
+    public resize(){
+
     }
 }

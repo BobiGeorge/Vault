@@ -1,4 +1,5 @@
 import { Container, Sprite, Texture } from "pixi.js";
+import { Direction } from "../utils/Direction";
 
 export default class HandleTurner extends Container{
     

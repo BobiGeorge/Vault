@@ -6,6 +6,8 @@ export default class VaultDoor extends Container{
     private doorOpenName = "doorOpen";   //name of the texture
     private goldShineName = "blink";   //name of the texture
 
+    private textureScale = 4.5;
+
     doorSprite : Sprite;
 
     constructor(){
@@ -20,8 +22,8 @@ export default class VaultDoor extends Container{
 
     setClosedDoor(){
         //approximate values, needs fixing; TO DO
-        this.doorSprite.width /= 4.5;
-        this.doorSprite.height /= 4.5;
+        this.doorSprite.width /= this.textureScale;
+        this.doorSprite.height /= this.textureScale;
         
         //approximate values, needs fixing; TO DO
         this.doorSprite.position.x = 450;        
@@ -35,8 +37,8 @@ export default class VaultDoor extends Container{
         this.doorSprite.texture = doorTexture;
 
         //approximate values, needs fixing; TO DO
-        this.doorSprite.width = doorTexture.width/4.5;
-        this.doorSprite.height = doorTexture.height/4.5;
+        this.doorSprite.width = doorTexture.width/this.textureScale;
+        this.doorSprite.height = doorTexture.height/this.textureScale;
         
         //approximate values, needs fixing; TO DO
         this.doorSprite.position.x = 580;        
@@ -55,8 +57,9 @@ export default class VaultDoor extends Container{
         this.addChild(goldShineSprite);
     }
 
-    resize(width: number, height: number){
-        //TO DO
+    public resize(width: number, height: number){
+       // const doorTexture = Texture.from(this.doorName)
+        
     }
 
 }

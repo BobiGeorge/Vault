@@ -3,11 +3,12 @@ import Scene from "../core/Scene";
 import Handle from "../prefabs/Handle";
 import ParallaxBackground from "../prefabs/ParallaxBackground";
 import VaultDoor from "../prefabs/VaultDoor";
+import { Direction } from "../utils/Direction";
 
 export default class Vault extends Scene{
     name = "Vault";
 
-    public combination: boolean[] = [];    //true for left, false for right
+    public combination: Direction[] = [];    //true for left, false for right
 
     private combinationRange: number = 9; //combination number will be between 1 and combinationRange
 
@@ -22,12 +23,9 @@ export default class Vault extends Scene{
         this.handle = new Handle(this.turnHandle);
         
         this.addChild(this.background, this.vaultDoor, this.handle);
+       // this.addChild(this.background);
 
         this.generateCombination();
-    }
-
-    onResize(width: number, height: number): void {
-        this.background.resize(width, height);
     }
 
     //I assume you do not need to return to a starting position before entering the next step
@@ -40,7 +38,7 @@ export default class Vault extends Scene{
             const combinationNbr = Math.floor(Math.random() * this.combinationRange) + 1;
             const direction = Math.random() < 0.5;
             for (let y = 0; y < combinationNbr; y++) {
-                this.combination.push(direction);
+                this.combination.push(direction ? Direction.CLOCKWISE : Direction.COUNTERCLOCKWISE);
             }
         }        
         for (let i = 0; i < this.combination.length; i++) {
@@ -49,7 +47,7 @@ export default class Vault extends Scene{
         console.log(this.combination);
     }
 
-    private turnHandle = (direction: boolean) =>{
+    private turnHandle = (direction: Direction) =>{
         if (direction != this.combination[0]) this.generateCombination();
         else this.combination.shift();
         console.log(this.combination);
@@ -60,6 +58,12 @@ export default class Vault extends Scene{
         console.log("You won");
         this.vaultDoor.openDoor();
         this.handle.disable();
+    }
+
+    
+    onResize(width: number, height: number): void {
+        this.background.resize(width, height);
+        this.vaultDoor.resize(width, height);
     }
   
 }
