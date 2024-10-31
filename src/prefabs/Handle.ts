@@ -3,6 +3,7 @@ import * as PIXI from "pixi.js";
 import gsap from "gsap";
 import { PixiPlugin } from "gsap/PixiPlugin";
 import { Direction } from "../utils/Direction";
+import { wait } from "../utils/misc";
 
 // register the plugin
 gsap.registerPlugin(PixiPlugin);
@@ -13,11 +14,13 @@ PixiPlugin.registerPIXI(PIXI);
 export default class Handle extends Container{
 
     private handleName = "handle_test";   //name of the texture
+    private shadowName = "handleShadow";  //name of the texture
 
     private spinRotation = 1;  //the distance of a rotation
     private rotationPerTurn = 0.01 //how much the handle is turne by frame
 
     private handleSprite : Sprite;
+    private shadowSprite : Sprite;
 
     //starting mouse position when dragging the handle; only x is important
     private dragStartPositionX = 0;
@@ -32,24 +35,31 @@ export default class Handle extends Container{
         super();
 
         const handleTexture = Texture.from(this.handleName)
+        const shadowTexture = Texture.from(this.shadowName);
         this.handleSprite = Sprite.from(handleTexture);
+        this.shadowSprite = Sprite.from(shadowTexture);
 
-        this.setSprite();
+        this.setSprites();
         this.setHandleTurning();
     }
 
-    setSprite() {   
+    setSprites() {   
         //approximate values, needs fixing; TO DO
         this.handleSprite.width /= 4;
         this.handleSprite.height /= 4;
+        this.shadowSprite.width /= 4;
+        this.shadowSprite.height /= 4;
         
         //approximate values, needs fixing; TO DO
         this.handleSprite.position.x = 655;        
         this.handleSprite.position.y = 320;
+        this.shadowSprite.position.x = 665;        
+        this.shadowSprite.position.y = 330;
 
         this.handleSprite.anchor.set(0.5);
+        this.shadowSprite.anchor.set(0.5);
 
-        this.addChild(this.handleSprite);
+        this.addChild(this.shadowSprite, this.handleSprite);
     }
   
     setHandleTurning(){
@@ -62,16 +72,17 @@ export default class Handle extends Container{
     public startTurning(event: PIXI.FederatedPointerEvent){
         this.dragStartPositionX = event.pageX;
 
-        this.on("globalmousemove", this.turning);
+        this.on("globalmousemove", this.turn);
     }
 
-    public turning(event: PIXI.FederatedPointerEvent){
+    public turn(event: PIXI.FederatedPointerEvent){
         if(this.dragStartPositionX > event.pageX){
             if(this.movingLeft && this.currentDragPositionX < event.pageX){
                 this.stopTurning();
                 return;
             }
             this.handleSprite.rotation -= this.rotationPerTurn;
+            this.shadowSprite.rotation -= this.rotationPerTurn;
             if(!this.movingRight)    //only one should be true at a time: movingLeft or movingRight
                 this.movingLeft = true;
         }
@@ -81,6 +92,7 @@ export default class Handle extends Container{
                 return;
             }
             this.handleSprite.rotation += this.rotationPerTurn;
+            this.shadowSprite.rotation += this.rotationPerTurn;
             if(!this.movingLeft)    //only one should be true at a time: movingLeft or movingRight
                 this.movingRight = true;
         }
@@ -97,15 +109,19 @@ export default class Handle extends Container{
     }
 
     public stopTurning(){
+
         this.movingLeft = false;
         this.movingRight = false;
         this.rotationDistance = 0;
-        this.off("globalmousemove", this.turning);
+        this.off("globalmousemove", this.turn);
     }
 
     //when the combination resets, a crazy animation plays
-    public crazySpinAnimatio(){
-        //TO DO
+    public async crazySpinAnimatio(){
+        // this.setInterractive(false);
+        // await wait(500);
+        // this.handleSprite.rotation += 3;
+        // this.setInterractive(true);
     }
 
     setInterractive(interactive: boolean){
