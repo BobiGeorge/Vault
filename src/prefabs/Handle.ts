@@ -1,9 +1,7 @@
 import { Container, Sprite, Texture } from "pixi.js";
 import * as PIXI from "pixi.js";
 import gsap from "gsap";
-import HandleTurner from "./HandleTurner";
 import { PixiPlugin } from "gsap/PixiPlugin";
-import { wait } from "../utils/misc";
 import { Direction } from "../utils/Direction";
 
 // register the plugin
@@ -15,8 +13,9 @@ PixiPlugin.registerPIXI(PIXI);
 export default class Handle extends Container{
 
     private handleName = "handle_test";   //name of the texture
-    private spinDuration = 0.5;   
-    private spinRotation = 0.9;  //the degree of rotation; can use negative values to change direction
+
+    private spinRotation = 1;  //the distance of a rotation
+    private rotationPerTurn = 0.01 //how much the handle is turne by frame
 
     private handleSprite : Sprite;
 
@@ -27,9 +26,7 @@ export default class Handle extends Container{
     private movingLeft = false;
     private movingRight = false;
 
-    private requiredRotationDistance = 1;
-    private rotationPerTurn = 0.01
-    private rotationDistance = 0;
+    private rotationDistance = 0;     //tracks the length of a current rotation
 
     constructor(private onTurnCallback : (direction: Direction) => void){ 
         super();
@@ -75,7 +72,8 @@ export default class Handle extends Container{
                 return;
             }
             this.handleSprite.rotation -= this.rotationPerTurn;
-            this.movingLeft = true;
+            if(!this.movingRight)    //only one should be true at a time: movingLeft or movingRight
+                this.movingLeft = true;
         }
         else{
             if(this.movingRight && this.currentDragPositionX > event.pageX){
@@ -83,23 +81,22 @@ export default class Handle extends Container{
                 return;
             }
             this.handleSprite.rotation += this.rotationPerTurn;
-            this.movingRight = true;
+            if(!this.movingLeft)    //only one should be true at a time: movingLeft or movingRight
+                this.movingRight = true;
         }
         this.rotationDistance += this.rotationPerTurn;
         this.currentDragPositionX = event.pageX;
 
-        if(this.rotationDistance >= this.requiredRotationDistance){
-            console.log("Success");
+        if(this.rotationDistance >= this.spinRotation){ //checking if a full rotation has been made
             if(this.movingLeft)
-                this.onTurnCallback(Direction.CLOCKWISE);
-            if(this.movingRight)
                 this.onTurnCallback(Direction.COUNTERCLOCKWISE);
+            if(this.movingRight)
+                this.onTurnCallback(Direction.CLOCKWISE);
             this.stopTurning();
         }
     }
 
     public stopTurning(){
-        console.log("Stop Turning");
         this.movingLeft = false;
         this.movingRight = false;
         this.rotationDistance = 0;
@@ -111,7 +108,6 @@ export default class Handle extends Container{
         //TO DO
     }
 
-    //sets interractivity for both handles; both are always either enabled or disabled at once
     setInterractive(interactive: boolean){
         this.interactive = interactive;
     }

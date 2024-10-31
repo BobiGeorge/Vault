@@ -1,4 +1,4 @@
 export const enum Direction {
-    CLOCKWISE,
-    COUNTERCLOCKWISE
+    CLOCKWISE = "Clockwise",
+    COUNTERCLOCKWISE = "Counterclockwise",
   }
