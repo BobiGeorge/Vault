@@ -48,9 +48,14 @@ export default class Vault extends Scene{
     }
 
     private turnHandle = (direction: Direction) =>{
-        if (direction != this.combination[0]) this.generateCombination();
+        //This is where we reset if input is wrong
+        if (direction != this.combination[0]){
+            this.generateCombination();
+            this.handle.reset();
+        }
         else this.combination.shift();
         console.log(this.combination);
+        //this is where we evaluate winning the condition
         if(this.combination.length == 0) this.win();
     }
 

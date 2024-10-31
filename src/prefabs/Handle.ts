@@ -81,8 +81,7 @@ export default class Handle extends Container{
                 this.stopTurning();
                 return;
             }
-            this.handleSprite.rotation -= this.rotationPerTurn;
-            this.shadowSprite.rotation -= this.rotationPerTurn;
+            this.rotateAnimation(-this.rotationPerTurn);
             if(!this.movingRight)    //only one should be true at a time: movingLeft or movingRight
                 this.movingLeft = true;
         }
@@ -91,8 +90,7 @@ export default class Handle extends Container{
                 this.stopTurning();
                 return;
             }
-            this.handleSprite.rotation += this.rotationPerTurn;
-            this.shadowSprite.rotation += this.rotationPerTurn;
+            this.rotateAnimation(this.rotationPerTurn);
             if(!this.movingLeft)    //only one should be true at a time: movingLeft or movingRight
                 this.movingRight = true;
         }
@@ -109,7 +107,6 @@ export default class Handle extends Container{
     }
 
     public stopTurning(){
-
         this.movingLeft = false;
         this.movingRight = false;
         this.rotationDistance = 0;
@@ -118,10 +115,19 @@ export default class Handle extends Container{
 
     //when the combination resets, a crazy animation plays
     public async crazySpinAnimatio(){
-        // this.setInterractive(false);
-        // await wait(500);
-        // this.handleSprite.rotation += 3;
-        // this.setInterractive(true);
+        this.setInterractive(false);
+
+        for (let i = 0; i < 3; i+=0.1) {
+            this.rotateAnimation(0.2);
+            await wait(0.02);
+        }
+ 
+        this.setInterractive(true);
+    }
+
+    rotateAnimation(duration: number){
+        this.handleSprite.rotation += duration;
+        this.shadowSprite.rotation += duration;
     }
 
     setInterractive(interactive: boolean){
@@ -131,5 +137,10 @@ export default class Handle extends Container{
     public disable(){
         this.interactive = false;
         this.visible = false;
+    }
+
+    //this is where outsiders tell the handle to perform any actions related to resetting
+    public reset(){
+        this.crazySpinAnimatio();
     }
 }
