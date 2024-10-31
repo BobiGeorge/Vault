@@ -10,7 +10,7 @@ export default class Vault extends Scene{
 
     public combination: Direction[] = [];    //true for left, false for right
 
-    private combinationRange: number = 9; //combination number will be between 1 and combinationRange
+    private combinationRange: number = 5; //combination number will be between 1 and combinationRange
 
     private background!: ParallaxBackground;
     private vaultDoor!: VaultDoor;

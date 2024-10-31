@@ -16,11 +16,20 @@ export default class Handle extends Container{
 
     private handleName = "handle_test";   //name of the texture
     private spinDuration = 0.5;   
-    private spinRotation = 2;  //the degree of rotation; can use negative values to change direction
+    private spinRotation = 0.9;  //the degree of rotation; can use negative values to change direction
 
     private handleSprite : Sprite;
-    private handleLeft : HandleTurner;
-    private handleRight : HandleTurner;
+
+    //starting mouse position when dragging the handle; only x is important
+    private dragStartPositionX = 0;
+    //prevents the player from dragging backwards once he's begun dragging in a certain direction
+    private currentDragPositionX = 0;
+    private movingLeft = false;
+    private movingRight = false;
+
+    private requiredRotationDistance = 1;
+    private rotationPerTurn = 0.01
+    private rotationDistance = 0;
 
     constructor(private onTurnCallback : (direction: Direction) => void){ 
         super();
@@ -28,11 +37,8 @@ export default class Handle extends Container{
         const handleTexture = Texture.from(this.handleName)
         this.handleSprite = Sprite.from(handleTexture);
 
-        this.handleLeft = new HandleTurner("arrow_left", 480, 100);
-        this.handleRight = new HandleTurner("arrow_right", 670, 100);
-
         this.setSprite();
-        this.setHandleTurners();
+        this.setHandleTurning();
     }
 
     setSprite() {   
@@ -49,32 +55,55 @@ export default class Handle extends Container{
         this.addChild(this.handleSprite);
     }
   
-    setHandleTurners(){
-        this.handleLeft.setInterractive(true);
-        this.handleRight.setInterractive(true);
-
-        this.handleLeft.on("mousedown", () => {this.turnHandle(Direction.CLOCKWISE);});
-        this.handleRight.on("mousedown", () => {this.turnHandle(Direction.COUNTERCLOCKWISE);});
-
-        this.addChild(this.handleLeft, this.handleRight);
-    }
-
-    //true for left, false for right
-    public async turnHandle(direction: Direction){
-        this.turnAnimation(direction); //animation needs to play first regardless of result
-
-        this.onTurnCallback(direction);
-        this.setInterractive(false);
-        await wait(this.spinDuration);  
+    setHandleTurning(){
         this.setInterractive(true);
+        this.on("mousedown", this.startTurning);
+        this.on("mouseupoutside", this.stopTurning);
+        this.on("mouseup", this.stopTurning);
     }
 
-    //true for left, false for right
-    //this method is responsible solely for animation
-    public turnAnimation(direction: Direction){        
-        const rotation = direction ? -Math.abs(this.spinRotation) : Math.abs(this.spinRotation);
-        gsap.to(this.handleSprite, {duration: this.spinDuration, rotation: rotation, repeatRefresh: true})     
-        //gsap.to(this.handleSprite, {pixi: {rotation: rotation}, duration: 1});
+    public startTurning(event: PIXI.FederatedPointerEvent){
+        this.dragStartPositionX = event.pageX;
+
+        this.on("globalmousemove", this.turning);
+    }
+
+    public turning(event: PIXI.FederatedPointerEvent){
+        if(this.dragStartPositionX > event.pageX){
+            if(this.movingLeft && this.currentDragPositionX < event.pageX){
+                this.stopTurning();
+                return;
+            }
+            this.handleSprite.rotation -= this.rotationPerTurn;
+            this.movingLeft = true;
+        }
+        else{
+            if(this.movingRight && this.currentDragPositionX > event.pageX){
+                this.stopTurning();
+                return;
+            }
+            this.handleSprite.rotation += this.rotationPerTurn;
+            this.movingRight = true;
+        }
+        this.rotationDistance += this.rotationPerTurn;
+        this.currentDragPositionX = event.pageX;
+
+        if(this.rotationDistance >= this.requiredRotationDistance){
+            console.log("Success");
+            if(this.movingLeft)
+                this.onTurnCallback(Direction.CLOCKWISE);
+            if(this.movingRight)
+                this.onTurnCallback(Direction.COUNTERCLOCKWISE);
+            this.stopTurning();
+        }
+    }
+
+    public stopTurning(){
+        console.log("Stop Turning");
+        this.movingLeft = false;
+        this.movingRight = false;
+        this.rotationDistance = 0;
+        this.off("globalmousemove", this.turning);
     }
 
     //when the combination resets, a crazy animation plays
@@ -84,16 +113,11 @@ export default class Handle extends Container{
 
     //sets interractivity for both handles; both are always either enabled or disabled at once
     setInterractive(interactive: boolean){
-        this.handleLeft.setInterractive(interactive);
-        this.handleRight.setInterractive(interactive);
+        this.interactive = interactive;
     }
 
     public disable(){
         this.interactive = false;
         this.visible = false;
-    }
-
-    public resize(){
-
     }
 }
