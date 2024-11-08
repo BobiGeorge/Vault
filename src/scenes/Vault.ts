@@ -8,14 +8,12 @@ import { Direction } from "../utils/Direction";
 export default class Vault extends Scene{
     name = "Vault";
 
-    public combination: Direction[] = [];    //true for left, false for right
-
+    public combination: Direction[] = [];    
     private combinationRange: number = 5; //combination number will be between 1 and combinationRange
 
     private background!: ParallaxBackground;
     private vaultDoor!: VaultDoor;
     private handle!: Handle;
-
 
     load() {
         this.background = new ParallaxBackground(config.backgrounds.vault);
@@ -23,7 +21,6 @@ export default class Vault extends Scene{
         this.handle = new Handle(this.turnHandle);
         
         this.addChild(this.background, this.vaultDoor, this.handle);
-       // this.addChild(this.background);
 
         this.generateCombination();
     }
@@ -48,15 +45,16 @@ export default class Vault extends Scene{
     }
 
     private turnHandle = (direction: Direction) =>{
-        //This is where we reset if input is wrong
-        if (direction != this.combination[0]){
+        if (direction != this.combination[0]){         //This is where we reset if input is wrong
             this.generateCombination();
             this.handle.reset();
         }
-        else this.combination.shift();
+        else {
+            this.combination.shift();
+            this.handle.successClickAnimation(direction);
+        }
         console.log(this.combination);
-        //this is where we evaluate winning the condition
-        if(this.combination.length == 0) this.win();
+        if(this.combination.length == 0) this.win();    //this is where we evaluate winning the condition
     }
 
     win(){
@@ -64,11 +62,10 @@ export default class Vault extends Scene{
         this.vaultDoor.openDoor();
         this.handle.disable();
     }
-
-    
+ 
     onResize(width: number, height: number): void {
         this.background.resize(width, height);
         this.vaultDoor.resize(width, height);
-    }
-  
+        this.handle.onResize();
+    } 
 }

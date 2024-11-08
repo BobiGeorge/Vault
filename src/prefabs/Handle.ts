@@ -22,6 +22,9 @@ export default class Handle extends Container{
     private handleSprite : Sprite;
     private shadowSprite : Sprite;
 
+    private handleTexture = Texture.from(this.handleName)
+
+
     //starting mouse position when dragging the handle; only x is important
     private dragStartPositionX = 0;
     //prevents the player from dragging backwards once he's begun dragging in a certain direction
@@ -34,22 +37,17 @@ export default class Handle extends Container{
     constructor(private onTurnCallback : (direction: Direction) => void){ 
         super();
 
-        const handleTexture = Texture.from(this.handleName)
         const shadowTexture = Texture.from(this.shadowName);
-        this.handleSprite = Sprite.from(handleTexture);
+        this.handleSprite = Sprite.from(this.handleTexture);
         this.shadowSprite = Sprite.from(shadowTexture);
 
-        this.setSprites();
-        this.setHandleTurning();
-    }
-
-    setSprites() {   
         //approximate values, needs fixing; TO DO
-        this.handleSprite.width /= 4;
-        this.handleSprite.height /= 4;
-        this.shadowSprite.width /= 4;
-        this.shadowSprite.height /= 4;
-        
+        // this.handleSprite.width =  this.handleTexture.width / (window.innerWidth / 250);
+        // this.handleSprite.height = this.handleTexture.height / (window.innerHeight / 167);
+        let scaleFactor = window.innerHeight / this.handleTexture.height / 3.5;
+        this.handleSprite.scale.set(scaleFactor);
+        this.shadowSprite.scale.set(scaleFactor);
+
         //approximate values, needs fixing; TO DO
         this.handleSprite.position.x = 655;        
         this.handleSprite.position.y = 320;
@@ -60,8 +58,10 @@ export default class Handle extends Container{
         this.shadowSprite.anchor.set(0.5);
 
         this.addChild(this.shadowSprite, this.handleSprite);
+
+        this.setHandleTurning();
     }
-  
+
     setHandleTurning(){
         this.setInterractive(true);
         this.on("mousedown", this.startTurning);
@@ -125,6 +125,30 @@ export default class Handle extends Container{
         this.setInterractive(true);
     }
 
+    public async successClickAnimation(direction: Direction){
+        this.setInterractive(false);
+        
+        let firstSpin = 0.03;
+        let secondSpin = 0.03;
+        if(direction == Direction.CLOCKWISE)
+            firstSpin *= -1;
+        else
+            secondSpin *= -1;
+
+
+        for (let i = 0; i < 1; i+= 0.2) {
+            this.rotateAnimation(firstSpin);
+            await wait(0.02);
+        }
+
+        for (let i = 0; i < 1; i+=0.2) {
+            this.rotateAnimation(secondSpin);
+            await wait(0.02);
+        }
+ 
+        this.setInterractive(true);
+    }
+
     rotateAnimation(duration: number){
         this.handleSprite.rotation += duration;
         this.shadowSprite.rotation += duration;
@@ -142,5 +166,23 @@ export default class Handle extends Container{
     //this is where outsiders tell the handle to perform any actions related to resetting
     public reset(){
         this.crazySpinAnimatio();
+    }
+
+    public onResize(){
+        console.log("Inner Height: " + window.innerHeight);
+        console.log("Outer Height: " + window.outerHeight);
+
+        // this.handleSprite.width =  this.handleTexture.width / (window.innerHeight / 167);
+        // this.handleSprite.height = this.handleTexture.height / (window.innerWidth / 250);
+
+        // let scaleFactor = window.innerHeight / this.handleTexture.height / 3;
+        // this.handleSprite.scale.set(scaleFactor);
+        // this.shadowSprite.scale.set(scaleFactor);
+
+        //  //approximate values, needs fixing; TO DO
+        //  this.handleSprite.position.x = window.innerWidth / 1.54;        
+        //  this.handleSprite.position.y = 320;
+        //  this.shadowSprite.position.x = window.innerWidth / 1.52;        
+        //  this.shadowSprite.position.y = 330;
     }
 }

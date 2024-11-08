@@ -1,5 +1,7 @@
 import type { BgConfig } from "./prefabs/ParallaxBackground";
 
+export const baseTextureScale = 4;
+
 type Config = {
   backgrounds: Record<string, BgConfig>;
 };

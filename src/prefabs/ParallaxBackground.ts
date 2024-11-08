@@ -37,6 +37,7 @@ export default class ParallaxBackground extends Container {
       );
 
       tilingSprite.scale.set(scaleFactor);
+      console.log("Scale Factor " + scaleFactor);
 
       tilingSprite.name = layer;
       tilingSprite.anchor.set(0.5);
